@@ -4,3 +4,4 @@ pymongo
 python-dotenv
 faker
 scikit-learn
+gunicorn
