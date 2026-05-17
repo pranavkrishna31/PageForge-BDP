@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from collections import Counter
 from metrics import precision_at_k, recall_at_k, ctr
 from datetime import datetime
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 load_dotenv()
 app = Flask(__name__)
@@ -146,22 +148,49 @@ def admin_page():
     # RECOMMENDED BOOKS
     # ====================================
 
+    interaction_counter = Counter()
+
+    interactions = list(
+
+        db.user_interactions.find({})
+
+    )
+
+    for interaction in interactions:
+
+        book_id = interaction.get("BookID")
+
+        interaction_type = interaction.get(
+
+            "InteractionType"
+
+        )
+
+        weight = 1
+
+        if interaction_type == "view":
+
+            weight = 1
+
+        elif interaction_type == "review":
+
+            weight = 4
+
+        elif interaction_type == "cart":
+
+            weight = 5
+
+        elif interaction_type == "purchase":
+
+            weight = 8
+
+        interaction_counter[book_id] += weight
+
     recommended_books = [
 
-        book["BookID"]
+        book_id
 
-        for book in sorted(
-
-            books,
-
-            key=lambda x: x.get(
-                "RatingMean",
-                0
-            ),
-
-            reverse=True
-
-        )[:5]
+        for book_id, score in interaction_counter.most_common(5)
 
     ]
 
@@ -446,7 +475,9 @@ def user_page():
 
     query = {}
 
+    # =========================
     # SEARCH
+    # =========================
 
     if q:
 
@@ -468,13 +499,17 @@ def user_page():
 
         ]
 
+    # =========================
     # GENRE FILTER
+    # =========================
 
     if genre:
 
         query['Genre'] = genre
 
+    # =========================
     # SORTING
+    # =========================
 
     sort_key = 'Price' if sort == 'price' else 'RatingMean'
 
@@ -490,11 +525,15 @@ def user_page():
 
     )
 
+    # =========================
     # GENRES
+    # =========================
 
     genres = db.books.distinct("Genre")
 
+    # =========================
     # TRACK SHOW COUNT
+    # =========================
 
     for book in books:
 
@@ -510,57 +549,237 @@ def user_page():
         )
 
     # =========================
-    # RECOMMENDATION SYSTEM
+    # FETCH ALL BOOKS
     # =========================
 
-    user_orders = db.orders.find({
+    all_books = list(
 
-        "Username": session.get("username")
+        db.books.find({}, {"_id": 0})
 
-    })
+    )
 
-    genre_counter = Counter()
+    recommended_books = []
 
-    for order in user_orders:
+    if len(all_books) > 1:
 
-        for book in order.get("Books", []):
+        # =========================
+        # CREATE TEXT CORPUS
+        # =========================
 
-            genre_counter[book["Genre"]] += 1
+        corpus = []
 
-    fav_genre = None
+        for book in all_books:
 
-    if genre_counter:
+            text = f"""
 
-        fav_genre = genre_counter.most_common(1)[0][0]
+            {book.get('Title', '')}
 
-        rec_books = list(
+            {book.get('Author', '')}
 
-            db.books.find(
+            {book.get('Genre', '')}
 
-                {"Genre": fav_genre},
+            {book.get('Description', '')}
 
-                {"_id": 0}
+            """
 
-            ).sort(
+            corpus.append(text)
 
-                "RatingMean",
-                -1
-            )
+        # =========================
+        # TF-IDF VECTORIZATION
+        # =========================
+
+        tfidf = TfidfVectorizer(
+
+            stop_words='english'
+
         )
 
-    else:
+        tfidf_matrix = tfidf.fit_transform(corpus)
 
-        rec_books = books
+        # =========================
+        # COSINE SIMILARITY
+        # =========================
 
-    rec_books = sorted(
+        similarity_matrix = cosine_similarity(
 
-        rec_books,
+            tfidf_matrix,
+            tfidf_matrix
 
-        key=lambda x: x.get("RatingMean", 0),
+        )
 
-        reverse=True
+        # =========================
+        # USER INTERACTIONS
+        # =========================
 
-    )[:5]
+        interactions = list(
+
+            db.user_interactions.find({
+
+                "Username": session.get("username")
+
+            })
+
+        )
+
+        # =========================
+        # INTERACTION WEIGHTS
+        # =========================
+
+        interaction_weights = {
+
+            "view": 1,
+
+            "review": 4,
+
+            "cart": 5,
+
+            "purchase": 8
+
+        }
+
+        weighted_scores = {}
+
+        interacted_book_ids = set()
+
+        for interaction in interactions:
+
+            book_id = interaction.get("BookID")
+
+            interaction_type = interaction.get(
+
+                "InteractionType"
+
+            )
+
+            weight = interaction_weights.get(
+
+                interaction_type,
+
+                1
+
+            )
+
+            # EXTRA BOOST FOR HIGH RATINGS
+
+            if interaction_type == "review":
+
+                rating_value = interaction.get(
+
+                    "InteractionValue",
+
+                    0
+
+                )
+
+                weight += rating_value
+
+            interacted_book_ids.add(book_id)
+
+            interacted_index = next(
+
+                (
+
+                    i for i, b in enumerate(all_books)
+
+                    if b["BookID"] == book_id
+
+                ),
+
+                None
+
+            )
+
+            if interacted_index is not None:
+
+                similarity_scores = list(
+
+                    enumerate(
+
+                        similarity_matrix[interacted_index]
+
+                    )
+
+                )
+
+                for idx, similarity_score in similarity_scores:
+
+                    candidate_book = all_books[idx]
+
+                    candidate_id = candidate_book["BookID"]
+
+                    if candidate_id == book_id:
+
+                        continue
+
+                    weighted_scores[candidate_id] = (
+
+                        weighted_scores.get(
+
+                            candidate_id,
+
+                            0
+
+                        )
+
+                        +
+
+                        (similarity_score * weight)
+
+                    )
+
+        # =========================
+        # SORT FINAL SCORES
+        # =========================
+
+        sorted_books = sorted(
+
+            weighted_scores.items(),
+
+            key=lambda x: x[1],
+
+            reverse=True
+
+        )
+
+        for book_id, score in sorted_books:
+
+            book = next(
+
+                (
+
+                    b for b in all_books
+
+                    if b["BookID"] == book_id
+
+                ),
+
+                None
+
+            )
+
+            if book:
+
+                recommended_books.append(book)
+
+            if len(recommended_books) >= 5:
+
+                break
+
+    # =========================
+    # FALLBACK RECOMMENDATIONS
+    # =========================
+
+    if not recommended_books:
+
+        recommended_books = sorted(
+
+            all_books,
+
+            key=lambda x: x.get("RatingMean", 0),
+
+            reverse=True
+
+        )[:5]
 
     return render_template(
 
@@ -570,14 +789,9 @@ def user_page():
 
         genres=genres,
 
-        recommended_books=rec_books
+        recommended_books=recommended_books
 
     )
-    
-# =========================
-# BOOK DETAIL PAGE
-# =========================
-
 # =========================
 # BOOK DETAIL PAGE
 # =========================
@@ -628,6 +842,24 @@ def book_detail(book_id):
             "ReviewText": review_text,
 
             "CreatedAt": datetime.utcnow()
+
+        })
+
+        # =========================
+        # STORE REVIEW INTERACTION
+        # =========================
+
+        db.user_interactions.insert_one({
+
+            "Username": session.get("username"),
+
+            "BookID": book_id,
+
+            "InteractionType": "review",
+
+            "InteractionValue": rating,
+
+            "Timestamp": datetime.utcnow()
 
         })
 
@@ -782,6 +1014,22 @@ def book_detail(book_id):
     )
 
     # =========================
+    # STORE VIEW INTERACTION
+    # =========================
+
+    db.user_interactions.insert_one({
+
+        "Username": session.get("username"),
+
+        "BookID": book_id,
+
+        "InteractionType": "view",
+
+        "Timestamp": datetime.utcnow()
+
+    })
+
+    # =========================
     # RELATED BOOKS
     # =========================
 
@@ -885,10 +1133,29 @@ def add_to_cart():
 
     cart = session.get('cart', [])
 
+    # =========================
     # PREVENT DUPLICATES
+    # =========================
+
     if str(book_id) not in [str(id) for id in cart]:
 
         cart.append(str(book_id))
+
+        # =========================
+        # STORE CART INTERACTION
+        # =========================
+
+        db.user_interactions.insert_one({
+
+            "Username": session.get("username"),
+
+            "BookID": int(book_id),
+
+            "InteractionType": "cart",
+
+            "Timestamp": datetime.utcnow()
+
+        })
 
     session['cart'] = cart
 
@@ -1038,41 +1305,241 @@ def delete_from_cart():
 
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout_page():
+
     if session.get('role') != 'user':
+
         flash('Please login as user.', 'danger')
+
         return redirect(url_for('login'))
-    cart_ids = [int(id) for id in session.get('cart', [])]
-    books = list(db.books.find({'BookID': {'$in': cart_ids}}, {'_id': 0}))
-    total = sum(book.get('Price', 0) for book in books)
+
+    cart_ids = [
+
+        int(id)
+
+        for id in session.get('cart', [])
+
+    ]
+
+    books = list(
+
+        db.books.find(
+
+            {
+
+                'BookID': {
+
+                    '$in': cart_ids
+
+                }
+
+            },
+
+            {
+
+                '_id': 0
+
+            }
+
+        )
+
+    )
+
+    total = sum(
+
+        book.get('Price', 0)
+
+        for book in books
+
+    )
+
+    # =========================
+    # PLACE ORDER
+    # =========================
+
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        address = request.form.get('address', '').strip()
-        phone = request.form.get('phone', '').strip()
-        payment_method = request.form.get('payment_method')
+
+        name = request.form.get(
+
+            'name',
+            ''
+
+        ).strip()
+
+        address = request.form.get(
+
+            'address',
+            ''
+
+        ).strip()
+
+        phone = request.form.get(
+
+            'phone',
+            ''
+
+        ).strip()
+
+        payment_method = request.form.get(
+
+            'payment_method'
+
+        )
+
+        # =========================
+        # TRACK PURCHASE SIGNALS
+        # =========================
+
         for book in books:
-            db.books.update_one({'BookID': book['BookID']}, {'$inc': {'ClickCount': 1}})
+
+            # CTR CLICK TRACKING
+
+            db.books.update_one(
+
+                {
+
+                    'BookID': book['BookID']
+
+                },
+
+                {
+
+                    '$inc': {
+
+                        'ClickCount': 1
+
+                    }
+
+                }
+
+            )
+
+            # =========================
+            # STORE PURCHASE INTERACTION
+            # =========================
+
+            db.user_interactions.insert_one({
+
+                "Username": session.get("username"),
+
+                "BookID": book['BookID'],
+
+                "InteractionType": "purchase",
+
+                "InteractionValue": book.get(
+
+                    "Price",
+
+                    0
+
+                ),
+
+                "Timestamp": datetime.utcnow()
+
+            })
+
+        # =========================
+        # SAVE ORDER
+        # =========================
+
         db.orders.insert_one({
+
             "Username": session.get('username'),
+
             "Name": name,
+
             "Address": address,
+
             "Phone": phone,
+
             "Books": books,
+
             "Total": total,
+
             "PaymentMethod": payment_method,
+
             "Date": datetime.utcnow()
+
         })
+
+        # CLEAR CART
+
         session['cart'] = []
-        flash('Order placed successfully!', 'success')
-        return redirect(url_for('orders_page'))
-    return render_template('checkout.html', books=books, total=total)
+
+        session.modified = True
+
+        flash(
+
+            'Order placed successfully!',
+
+            'success'
+
+        )
+
+        return redirect(
+
+            url_for('orders_page')
+
+        )
+
+    return render_template(
+
+        'checkout.html',
+
+        books=books,
+
+        total=total
+
+    )
+
+
+# =========================
+# ORDERS PAGE
+# =========================
 
 @app.route('/orders')
 def orders_page():
-    if session.get('role') != 'user':
-        return redirect(url_for('login'))
-    orders = list(db.orders.find({'Username': session.get('username')}, {'_id':0}).sort('Date', -1))
-    return render_template('orders.html', orders=orders)
 
+    if session.get('role') != 'user':
+
+        return redirect(
+
+            url_for('login')
+
+        )
+
+    orders = list(
+
+        db.orders.find(
+
+            {
+
+                'Username': session.get('username')
+
+            },
+
+            {
+
+                '_id': 0
+
+            }
+
+        ).sort(
+
+            'Date',
+
+            -1
+
+        )
+
+    )
+
+    return render_template(
+
+        'orders.html',
+
+        orders=orders
+
+    )
 # =========================
 # CONTACT PAGE
 # =========================
