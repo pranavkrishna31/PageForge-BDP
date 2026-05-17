@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="book-detail-wrapper">
+
+  <div class="book-detail-hero">
+
+    <!-- LEFT -->
+
+    <div class="book-cover-panel">
+
+      <div class="book-cover-card">
+
+        <div class="book-cover-glow"></div>
+
+        <!-- COVER -->
+
+        <div class="book-cover-image">
+
+          <i class="bi bi-book-half"></i>
+
+        </div>
+
+        <!-- INFO -->
+
+        <div>
+
+          <div class="book-cover-title">
+
+            {{ book.Title }}
+
+          </div>
+
+          <div class="book-cover-author">
+
+            by {{ book.Author }}
+
+          </div>
+
+          <div class="book-cover-price">
+
+            ₹{{ "%.2f"|format(book.Price) }}
+
+          </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="book-detail-actions">
+
+          <!-- CART -->
+
+          <form
+            method="post"
+            action="{{ url_for('add_to_cart') }}"
+            class="add-to-cart-form"
+          >
+
+            <input
+              type="hidden"
+              name="book_id"
+              value="{{ book.BookID }}"
+            >
+
+            <button
+              type="submit"
+              class="book-btn-primary"
+            >
+
+              Add To Cart
+
+            </button>
+
+          </form>
+
+          <!-- BUY -->
+
+          <form
+            method="get"
+            action="{{ url_for('checkout_page') }}"
+          >
+
+            <input
+              type="hidden"
+              name="book_id"
+              value="{{ book.BookID }}"
+            >
+
+            <button
+              type="submit"
+              class="book-btn-secondary"
+            >
+
+              Buy Now
+
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="book-detail-main">
+
+      <!-- DESCRIPTION -->
+
+      <div class="detail-panel">
+
+        <div class="detail-panel-glow"></div>
+
+        <div class="detail-top-row">
+
+          <div class="detail-chip">
+
+            <i class="bi bi-tags"></i>
+
+            {{ book.Genre }}
+
+          </div>
+
+          <div class="detail-chip">
+
+            <i class="bi bi-star-fill"></i>
+
+            {{ "%.1f"|format(book.RatingMean) }} Rating
+
+          </div>
+
+          <div class="detail-chip">
+
+            <i class="bi bi-graph-up-arrow"></i>
+
+            Trending Read
+
+          </div>
+
+        </div>
+
+        <div class="detail-heading">
+
+          About This Book
+
+        </div>
+
+        <div class="detail-description">
+
+          "{{ book.Title }}" by {{ book.Author }}
+          delivers a compelling reading experience
+          blending immersive storytelling, engaging
+          narrative pacing, and emotionally resonant
+          themes. Readers interested in {{ book.Genre }}
+          literature will appreciate the layered
+          character development and thoughtfully
+          constructed world-building throughout
+          the journey.
+
+          <br><br>
+
+          This title continues to attract strong
+          engagement across recommendation systems,
+          making it one of the platform's highly
+          interacted selections among readers exploring
+          intelligent personalized discovery experiences.
+
+        </div>
+
+      </div>
+
+      <!-- AUTHOR -->
+
+      <div class="detail-panel">
+
+        <div class="detail-panel-glow"></div>
+
+        <div class="detail-heading">
+
+          About The Author
+
+        </div>
+
+        <div class="author-box">
+
+          <div class="author-avatar">
+
+            <i class="bi bi-person-fill"></i>
+
+          </div>
+
+          <div>
+
+            <div class="author-name">
+
+              {{ book.Author }}
+
+            </div>
+
+            <div class="author-desc">
+
+              {{ book.Author }} is recognized for
+              creating engaging literary experiences
+              within the {{ book.Genre }} genre.
+              Their works continue to resonate with
+              readers through emotionally immersive
+              storytelling, memorable themes, and
+              impactful narrative depth.
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+<!-- REVIEWS -->
+
+<div class="detail-panel">
+
+  <div class="detail-panel-glow"></div>
+
+  <div class="detail-heading">
+
+    Reader Reviews
+
+  </div>
+
+  <!-- EMPTY -->
+
+  {% if not reviews %}
+
+  <div class="empty-review-box">
+
+    <div class="empty-review-icon">
+
+      <i class="bi bi-chat-square-text"></i>
+
+    </div>
+
+    <h3>
+
+      No Reviews Yet
+
+    </h3>
+
+    <p>
+
+      Be the first reader to share
+      your experience about this book.
+
+    </p>
+
+  </div>
+
+  {% endif %}
+
+  <!-- REVIEW FORM -->
+
+  <form
+    method="post"
+    class="review-form"
+  >
+
+    <!-- STARS -->
+
+    <div class="review-rating-row">
+
+      <label>
+
+        Rating
+
+      </label>
+
+      <select
+  name="rating"
+  class="futuristic-input review-dropdown"
+  required
+>
+
+  <option value="">
+    Select Rating
+  </option>
+
+  <option value="5">
+    ★★★★★ Excellent
+  </option>
+
+  <option value="4">
+    ★★★★☆ Very Good
+  </option>
+
+  <option value="3">
+    ★★★☆☆ Good
+  </option>
+
+  <option value="2">
+    ★★☆☆☆ Average
+  </option>
+
+  <option value="1">
+    ★☆☆☆☆ Poor
+  </option>
+
+</select>
+
+    </div>
+
+    <!-- TEXT -->
+
+    <textarea
+      name="review_text"
+      class="review-textarea"
+      placeholder="Write your review..."
+      required
+    ></textarea>
+
+    <button
+      type="submit"
+      class="submit-review-btn"
+    >
+
+      Submit Review
+
+    </button>
+
+  </form>
+
+  <!-- REVIEW LIST -->
+
+  {% if reviews %}
+
+  <div class="review-grid">
+
+    {% for review in reviews %}
+
+    <div class="review-card">
+
+      <div class="review-top">
+
+        <div class="review-user">
+
+          {{ review.Username }}
+
+        </div>
+
+        <div class="review-stars">
+
+          {{ "★" * review.Rating }}
+
+        </div>
+
+      </div>
+
+      <div class="review-text">
+
+        {{ review.ReviewText }}
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+  {% endif %}
+
+</div>
+      <!-- RELATED -->
+
+      {% if related_books %}
+
+      <div class="detail-panel">
+
+        <div class="detail-panel-glow"></div>
+
+        <div class="detail-heading">
+
+          Related Books
+
+        </div>
+
+        <div class="book-grid">
+
+          {% for rel in related_books %}
+
+          <div class="book-card small-related-card">
+
+            <a
+              href="{{ url_for('book_detail', book_id=rel.BookID) }}"
+              class="book-overlay-link"
+            ></a>
+
+            <div class="book-glow"></div>
+
+            <div class="book-top">
+
+              <div class="genre-pill">
+
+                {{ rel.Genre }}
+
+              </div>
+
+              <div class="rating-pill">
+
+                ★ {{ "%.1f"|format(rel.RatingMean) }}
+
+              </div>
+
+            </div>
+
+            <div class="book-card-content">
+
+              <h3 class="book-title">
+
+                {{ rel.Title }}
+
+              </h3>
+
+              <p class="book-author">
+
+                {{ rel.Author }}
+
+              </p>
+
+              <div class="book-price">
+
+                ₹{{ "%.2f"|format(rel.Price) }}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}

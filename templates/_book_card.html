@@ -1,0 +1,17 @@
+<div class="card h-100 p-3">
+  <h5>{{ book.Title }}</h5>
+  <p class="mb-1">by <b>{{ book.Author }}</b></p>
+  <p class="mb-1">Genre: {{ book.Genre }}</p>
+  <p class="mb-1">Price: ₹{{ "%.2f"|format(book.Price) }}</p>
+  <p class="mb-1">Rating: {{ "%.1f"|format(book.RatingMean) }} ★</p>
+  <div class="mt-2">
+    <form method="post" action="{{ url_for('add_to_cart') }}">
+      <input type="hidden" name="book_id" value="{{ book.BookID }}">
+      <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+    </form>
+    <form method="get" action="{{ url_for('checkout_page') }}" class="mt-1">
+      <input type="hidden" name="book_id" value="{{ book.BookID }}">
+      <button type="submit" class="btn btn-outline-primary btn-sm w-100">Buy Now</button>
+    </form>
+  </div>
+</div>

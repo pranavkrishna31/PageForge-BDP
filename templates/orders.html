@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="orders-wrapper">
+
+  <!-- HEADER -->
+
+  <div class="orders-header">
+
+    <p class="section-tag">
+      PURCHASE HISTORY
+    </p>
+
+    <h1 class="orders-title">
+
+      Your Orders
+
+    </h1>
+
+    <p class="orders-subtitle">
+
+      Track completed purchases and revisit
+      your reading collection anytime.
+
+    </p>
+
+  </div>
+
+  {% if orders %}
+
+  <div class="orders-grid">
+
+    {% for order in orders %}
+
+    <div class="order-card">
+
+      <div class="order-glow"></div>
+
+      <!-- TOP -->
+
+      <div class="order-top">
+
+        <div>
+
+          <div class="order-date-label">
+
+            ORDER PLACED
+
+          </div>
+
+          <div class="order-date">
+
+            {{ order.Date.strftime('%d %b %Y · %I:%M %p') }}
+
+          </div>
+
+        </div>
+
+        <div class="order-status">
+
+          <i class="bi bi-check-circle-fill"></i>
+
+          Completed
+
+        </div>
+
+      </div>
+
+      <!-- CUSTOMER -->
+
+      <div class="order-user-info">
+
+        <div class="info-chip">
+
+          <i class="bi bi-person"></i>
+
+          {{ order.Name }}
+
+        </div>
+
+        <div class="info-chip">
+
+          <i class="bi bi-telephone"></i>
+
+          {{ order.Phone }}
+
+        </div>
+
+        <div class="info-chip">
+
+          <i class="bi bi-credit-card"></i>
+
+          {{ order.PaymentMethod }}
+
+        </div>
+
+      </div>
+
+      <!-- ADDRESS -->
+
+      <div class="delivery-box">
+
+        <div class="delivery-label">
+
+          DELIVERY ADDRESS
+
+        </div>
+
+        <p>
+
+          {{ order.Address }}
+
+        </p>
+
+      </div>
+
+      <!-- BOOKS -->
+
+      <div class="ordered-books-section">
+
+        <div class="books-heading">
+
+          Purchased Books
+
+        </div>
+
+        <div class="ordered-books-list">
+
+          {% for book in order.Books %}
+
+          <div class="ordered-book-item">
+
+            <div>
+
+              <div class="ordered-book-title">
+
+                {{ book.Title }}
+
+              </div>
+
+            </div>
+
+            <div class="ordered-book-price">
+
+              ₹{{ "%.2f"|format(book.Price) }}
+
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+      <!-- TOTAL -->
+
+      <div class="order-total-row">
+
+        <span>
+
+          Total Paid
+
+        </span>
+
+        <strong>
+
+          ₹{{ "%.2f"|format(order.Total) }}
+
+        </strong>
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+  {% else %}
+
+  <!-- EMPTY -->
+
+  <div class="empty-orders-wrapper">
+
+    <div class="empty-orders-card">
+
+      <div class="empty-orders-icon">
+
+        <i class="bi bi-journal-x"></i>
+
+      </div>
+
+      <h2>
+
+        No Orders Yet
+
+      </h2>
+
+      <p>
+
+        Start exploring personalized recommendations
+        and build your digital library experience.
+
+      </p>
+
+      <a
+        href="{{ url_for('user_page') }}"
+        class="empty-orders-btn"
+      >
+
+        Explore Books
+
+      </a>
+
+    </div>
+
+  </div>
+
+  {% endif %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+  <!-- HEADER -->
+
+  <div class="admin-hero">
+
+    <div>
+
+      <p class="admin-tag">
+
+        RECOMMENDATION CONTROL CENTER
+
+      </p>
+
+      <h1 class="admin-title">
+
+        AI Analytics Dashboard
+
+      </h1>
+
+      <p class="admin-subtitle">
+
+        Monitor recommendation engagement,
+        CTR behavior, inventory intelligence,
+        and platform performance metrics.
+
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- KPI -->
+
+  <div class="kpi-grid">
+
+    <!-- PRECISION -->
+
+    <div class="kpi-card">
+
+      <div class="kpi-glow"></div>
+
+      <div class="kpi-label">
+
+        Precision@{{ k }}
+
+      </div>
+
+      <div class="kpi-value">
+
+        {{ "%.2f"|format(precision) }}
+
+      </div>
+
+      <div class="kpi-desc">
+
+        Recommendation relevance score
+
+      </div>
+
+    </div>
+
+    <!-- RECALL -->
+
+    <div class="kpi-card">
+
+      <div class="kpi-glow"></div>
+
+      <div class="kpi-label">
+
+        Recall@{{ k }}
+
+      </div>
+
+      <div class="kpi-value">
+
+        {{ "%.2f"|format(recall) }}
+
+      </div>
+
+      <div class="kpi-desc">
+
+        Recommendation coverage score
+
+      </div>
+
+    </div>
+
+    <!-- CTR -->
+
+    <div class="kpi-card">
+
+      <div class="kpi-glow"></div>
+
+      <div class="kpi-label">
+
+        Avg. Book CTR
+
+      </div>
+
+      <div class="kpi-value">
+
+        {{ "%.2f"|format(avg_ctr) }}
+
+      </div>
+
+      <div class="kpi-desc">
+
+        Reader interaction efficiency
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MAIN GRID -->
+
+  <div class="admin-grid">
+
+    <!-- LEFT -->
+
+    <div class="admin-left">
+
+      <!-- INVENTORY -->
+
+      <div class="admin-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-tag">
+
+              INVENTORY INTELLIGENCE
+
+            </div>
+
+            <h3>
+
+              Recommendation Inventory
+
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="inventory-table-wrapper">
+
+          <table class="inventory-table">
+
+            <thead>
+
+              <tr>
+
+                <th>Book</th>
+
+                <th>CTR</th>
+
+                <th>Clicks</th>
+
+                <th>Views</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {% for book in books %}
+
+              <tr>
+
+                <td>
+
+                  {{ book.Title }}
+
+                </td>
+
+                <td>
+
+                  {{ "%.2f"|format(book.CTR) }}
+
+                </td>
+
+                <td>
+
+                  {{ book.ClickCount }}
+
+                </td>
+
+                <td>
+
+                  {{ book.ShowCount }}
+
+                </td>
+
+              </tr>
+
+              {% endfor %}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- CHART -->
+
+      <div class="admin-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-tag">
+
+              SALES ANALYTICS
+
+            </div>
+
+            <h3>
+
+              30-Day Top Sellers
+
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="chart-wrapper">
+
+          <canvas id="salesChart"></canvas>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="admin-right">
+
+      <!-- ADD SALE -->
+
+      <div class="admin-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-tag">
+
+              SALES MANAGEMENT
+
+            </div>
+
+            <h3>
+
+              Add Sales Record
+
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="panel-body">
+
+          <input
+            id="sale-book"
+            class="futuristic-input mb-3"
+            placeholder="Book ID"
+          >
+
+          <input
+            id="sale-units"
+            class="futuristic-input mb-3"
+            placeholder="Units Sold"
+          >
+
+          <input
+            id="sale-date"
+            type="date"
+            class="futuristic-input mb-3"
+          >
+
+          <button
+            class="admin-btn-primary"
+            id="btn-add-sale"
+          >
+
+            Add Sale
+
+          </button>
+
+          <div id="sale-msg"></div>
+
+        </div>
+
+      </div>
+
+      <!-- STOCK -->
+
+      <div class="admin-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-tag">
+
+              INVENTORY CONTROL
+
+            </div>
+
+            <h3>
+
+              Update Stock
+
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="panel-body">
+
+          <input
+            id="up-book"
+            class="futuristic-input mb-3"
+            placeholder="Book ID"
+          >
+
+          <input
+            id="up-stock"
+            class="futuristic-input mb-3"
+            placeholder="New Stock"
+          >
+
+          <button
+            class="admin-btn-primary"
+            id="btn-update-stock"
+          >
+
+            Update Inventory
+
+          </button>
+
+          <div id="up-msg"></div>
+
+        </div>
+
+      </div>
+
+      <!-- INSIGHTS -->
+
+      <div class="admin-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <div class="panel-tag">
+
+              AI INSIGHTS
+
+            </div>
+
+            <h3>
+
+              Recommendation Signals
+
+            </h3>
+
+          </div>
+
+        </div>
+
+        <div class="insight-list">
+
+          <div class="insight-item">
+
+            <span class="signal-dot"></span>
+
+            Highest engagement from
+            genre-based recommendations
+
+          </div>
+
+          <div class="insight-item">
+
+            <span class="signal-dot"></span>
+
+            CTR improves after
+            detail-page interaction
+
+          </div>
+
+          <div class="insight-item">
+
+            <span class="signal-dot"></span>
+
+            Readers with purchase history
+            interact more frequently
+
+          </div>
+
+          <div class="insight-item">
+
+            <span class="signal-dot"></span>
+
+            Personalized discovery
+            increases recommendation recall
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- CHART JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const labels = {{ seller_labels|tojson }};
+
+const values = {{ seller_values|tojson }};
+
+const ctx = document.getElementById('salesChart');
+
+
+new Chart(ctx, {
+
+  type: 'bar',
+
+  data: {
+
+    labels: labels,
+
+    datasets: [{
+
+      label: 'Units Sold',
+
+      data: values,
+
+      borderRadius: 14,
+
+      backgroundColor: [
+
+        '#7c3aed',
+        '#8b5cf6',
+        '#38bdf8',
+        '#0ea5e9',
+        '#6366f1'
+      ]
+
+    }]
+  },
+
+  options: {
+
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+
+      legend: {
+
+        labels: {
+
+          color: '#ffffff'
+        }
+      }
+    },
+
+    scales: {
+
+      x: {
+
+        ticks: {
+
+          color: '#ffffff'
+        },
+
+        grid: {
+
+          color: 'rgba(255,255,255,0.05)'
+        }
+      },
+
+      y: {
+
+        beginAtZero: true,
+
+        ticks: {
+
+          color: '#ffffff'
+        },
+
+        grid: {
+
+          color: 'rgba(255,255,255,0.05)'
+        }
+      }
+    }
+  }
+});
+
+</script>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="payment-page">
+
+  <!-- HEADER -->
+
+  <div class="payment-header">
+
+    <p class="section-tag">
+      SECURE PAYMENT PORTAL
+    </p>
+
+    <h1 class="payment-title">
+      Complete Your Purchase
+    </h1>
+
+    <p class="payment-subtitle">
+
+      Finalize your order securely using your
+      preferred payment method.
+
+    </p>
+
+  </div>
+
+  <div class="payment-layout">
+
+    <!-- LEFT -->
+
+    <div class="payment-summary-card">
+
+      <div class="summary-top">
+
+        <h3>
+          Order Summary
+        </h3>
+
+        <div class="summary-badge">
+
+          {{ books|length }} Books
+
+        </div>
+
+      </div>
+
+      <div class="summary-books">
+
+        {% for book in books %}
+
+        <div class="summary-book-item">
+
+          <div>
+
+            <div class="summary-book-title">
+
+              {{ book.Title }}
+
+            </div>
+
+            <div class="summary-book-author">
+
+              {{ book.Author }}
+
+            </div>
+
+          </div>
+
+          <div class="summary-book-price">
+
+            ₹{{ "%.2f"|format(book.Price) }}
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+      <div class="summary-total">
+
+        <span>
+          Total Amount
+        </span>
+
+        <strong>
+          ₹{{ "%.2f"|format(total) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="payment-main-card">
+
+      <!-- USER -->
+
+      <div class="payment-user-box">
+
+        <div class="user-chip">
+
+          <i class="bi bi-person"></i>
+
+          {{ user.Username }}
+
+        </div>
+
+        <div class="user-chip">
+
+          <i class="bi bi-geo-alt"></i>
+
+          {{ user.Address }}
+
+        </div>
+
+        <div class="user-chip">
+
+          <i class="bi bi-telephone"></i>
+
+          {{ user.Phone }}
+
+        </div>
+
+      </div>
+
+      <!-- FORM -->
+
+      <form method="post">
+
+        <div class="payment-methods-header">
+
+          <h3>
+            Choose Payment Method
+          </h3>
+
+          <p>
+            All transactions are encrypted
+          </p>
+
+        </div>
+
+        <div class="payment-grid">
+
+          <!-- PAYTM -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="Paytm"
+              required
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/paytm.svg"
+                alt="Paytm"
+              >
+
+              <span>
+                Paytm
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- GPAY -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="GooglePay"
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlepay.svg"
+                alt="Google Pay"
+              >
+
+              <span>
+                Google Pay
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- PHONEPE -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="PhonePe"
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="{{ url_for('static', filename='img/phonpebw.png') }}"
+                alt="PhonePe"
+              >
+
+              <span>
+                PhonePe
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- VISA -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="Visa"
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/visa.svg"
+                alt="Visa"
+              >
+
+              <span>
+                Visa
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- MASTERCARD -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="MasterCard"
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/mastercard.svg"
+                alt="MasterCard"
+              >
+
+              <span>
+                MasterCard
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- RUPAY -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="RuPay"
+            >
+
+            <div class="payment-card-inner">
+
+              <img
+                src="{{ url_for('static', filename='img/Rupay-Logo.png') }}"
+                alt="RuPay"
+              >
+
+              <span>
+                RuPay
+              </span>
+
+            </div>
+
+          </label>
+
+          <!-- COD -->
+
+          <label class="payment-card">
+
+            <input
+              type="radio"
+              name="payment_method"
+              value="COD"
+            >
+
+            <div class="payment-card-inner">
+
+              <i class="bi bi-cash-stack"></i>
+
+              <span>
+                Cash On Delivery
+              </span>
+
+            </div>
+
+          </label>
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <button
+          type="submit"
+          class="complete-payment-btn"
+        >
+
+          <i class="bi bi-shield-check"></i>
+
+          Place Secure Order
+
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}

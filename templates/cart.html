@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="cart-wrapper">
+
+  <!-- HEADER -->
+
+  <div class="cart-header">
+
+    <p class="section-tag">
+      SMART CHECKOUT
+    </p>
+
+    <h1 class="cart-title">
+
+      Your Cart
+
+    </h1>
+
+  </div>
+
+  {% if books %}
+
+  <div class="cart-layout">
+
+    <!-- LEFT -->
+
+    <div class="cart-items-grid">
+
+      {% for book in books %}
+
+      <div class="cart-book-card">
+
+        <div class="cart-card-glow"></div>
+
+        <!-- TOP -->
+
+        <div class="cart-card-top">
+
+          <div class="genre-pill">
+
+            {{ book.Genre }}
+
+          </div>
+
+          <div class="rating-pill">
+
+            ★ {{ "%.1f"|format(book.RatingMean) }}
+
+          </div>
+
+        </div>
+
+        <!-- TITLE -->
+
+        <h3 class="cart-book-title">
+
+          {{ book.Title }}
+
+        </h3>
+
+        <p class="cart-book-author">
+
+          {{ book.Author }}
+
+        </p>
+
+        <!-- PRICE -->
+
+        <div class="cart-price">
+
+          ₹{{ "%.2f"|format(book.Price) }}
+
+        </div>
+
+        <!-- ACTIONS -->
+
+        <div class="cart-actions">
+
+          <form
+            method="post"
+            action="{{ url_for('delete_from_cart') }}"
+          >
+
+            <input
+              type="hidden"
+              name="book_id"
+              value="{{ book.BookID }}"
+            >
+
+            <button
+              type="submit"
+              class="delete-cart-btn"
+            >
+
+              <i class="bi bi-trash3"></i>
+
+              Remove
+
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="checkout-panel">
+
+      <div class="checkout-card">
+
+        <div class="checkout-label">
+
+          ORDER SUMMARY
+
+        </div>
+
+        <h3 class="checkout-title">
+
+          Secure Checkout
+
+        </h3>
+
+        <!-- STATS -->
+
+        <div class="checkout-stat">
+
+          <span>
+            Books Added
+          </span>
+
+          <strong>
+
+            {{ books|length }}
+
+          </strong>
+
+        </div>
+
+        <div class="checkout-stat">
+
+          <span>
+            Platform Fee
+          </span>
+
+          <strong>
+
+            ₹0.00
+
+          </strong>
+
+        </div>
+
+        <div class="checkout-stat total-row">
+
+          <span>
+            Total Amount
+          </span>
+
+          <strong>
+
+            ₹{{ "%.2f"|format(total) }}
+
+          </strong>
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <a
+          href="{{ url_for('checkout_page') }}"
+          class="checkout-btn"
+        >
+
+          Proceed To Checkout
+
+        </a>
+
+        <!-- SMALL NOTE -->
+
+        <p class="checkout-note">
+
+          Encrypted checkout experience powered by
+          PageForge recommendation infrastructure.
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {% else %}
+
+  <!-- EMPTY -->
+
+  <div class="empty-cart-wrapper">
+
+    <div class="empty-cart-card">
+
+      <div class="empty-icon">
+
+        <i class="bi bi-bag-x"></i>
+
+      </div>
+
+      <h2>
+
+        Your Cart Is Empty
+
+      </h2>
+
+      <p>
+
+        Explore personalized recommendations and
+        start building your reading collection.
+
+      </p>
+
+      <a
+        href="{{ url_for('user_page') }}"
+        class="empty-cart-btn"
+      >
+
+        Explore Books
+
+      </a>
+
+    </div>
+
+  </div>
+
+  {% endif %}
+
+</section>
+
+{% endblock %}

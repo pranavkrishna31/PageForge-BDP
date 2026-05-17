@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="contact-wrapper">
+
+  <div class="contact-container">
+
+    <!-- LEFT PANEL -->
+
+    <div class="contact-info-card">
+
+      <div class="auth-badge">
+        Support Portal
+      </div>
+
+      <h1 class="contact-title">
+
+        Let's
+
+        <span>Connect</span>
+
+      </h1>
+
+      <p class="contact-subtitle">
+
+        Submit platform issues, recommendation feedback,
+        feature requests, or technical queries regarding
+        the PageForge ecosystem.
+
+      </p>
+
+      <div class="contact-feature-box">
+
+        <div class="floating-label">
+          Recommendation System Assistance
+        </div>
+
+        <div class="floating-desc">
+
+          Our intelligent support portal helps track
+          recommendation concerns, platform issues,
+          and personalized reading feedback.
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FORM PANEL -->
+
+    <div class="contact-card">
+
+      <div class="contact-header">
+
+        <p class="section-tag">
+          CONTACT SUPPORT
+        </p>
+
+        <h2 class="contact-heading">
+          Submit Query
+        </h2>
+
+      </div>
+
+      <form method="POST">
+
+        <!-- USERNAME -->
+
+        <div class="auth-input-group">
+
+          <label>
+            Username
+          </label>
+
+          <input
+            type="text"
+            name="username"
+            class="auth-input"
+            placeholder="Enter your username"
+            required
+          >
+
+        </div>
+
+        <!-- EMAIL -->
+
+        <div class="auth-input-group">
+
+          <label>
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            class="auth-input"
+            placeholder="Enter your email"
+          >
+
+        </div>
+
+        <!-- SUBJECT -->
+
+        <div class="auth-input-group">
+
+          <label>
+            Subject
+          </label>
+
+          <input
+            type="text"
+            name="subject"
+            class="auth-input"
+            placeholder="Enter query subject"
+            required
+          >
+
+        </div>
+
+        <!-- MESSAGE -->
+
+        <div class="auth-input-group">
+
+          <label>
+            Your Query
+          </label>
+
+          <textarea
+            name="query_message"
+            class="contact-textarea"
+            placeholder="Describe your issue or feedback..."
+            required
+          ></textarea>
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <button
+          type="submit"
+          class="auth-submit-btn"
+        >
+
+          Submit Query
+
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}

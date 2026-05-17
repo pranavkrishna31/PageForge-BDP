@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="checkout-wrapper">
+
+  <!-- HEADER -->
+
+  <div class="checkout-page-header">
+
+    <p class="section-tag">
+      SECURE PAYMENT PORTAL
+    </p>
+
+    <h1 class="checkout-main-title">
+
+      Checkout 
+
+    </h1>
+
+  </div>
+
+  {% if books %}
+
+  <div class="checkout-layout">
+
+    <!-- LEFT -->
+
+    <div class="checkout-form-panel">
+
+      <div class="glass-panel">
+
+        <div class="panel-heading">
+
+          <h3>
+            Shipping Details
+          </h3>
+
+          <p>
+            Enter delivery and payment information
+          </p>
+
+        </div>
+
+        <form method="post">
+
+          <!-- NAME -->
+
+          <div class="auth-input-group">
+
+            <label>
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              name="name"
+              class="auth-input"
+              placeholder="Enter your full name"
+              required
+            >
+
+          </div>
+
+          <!-- ADDRESS -->
+
+          <div class="auth-input-group">
+
+            <label>
+              Delivery Address
+            </label>
+
+            <textarea
+              name="address"
+              class="checkout-textarea"
+              placeholder="Enter complete delivery address"
+              required
+            ></textarea>
+
+          </div>
+
+          <!-- PHONE -->
+
+          <div class="auth-input-group">
+
+            <label>
+              Phone Number
+            </label>
+
+            <input
+              type="text"
+              name="phone"
+              class="auth-input"
+              placeholder="Enter phone number"
+              required
+            >
+
+          </div>
+
+          <!-- PAYMENT -->
+
+          <div class="payment-section">
+
+            <div class="payment-heading">
+
+              Choose Payment Method
+
+            </div>
+
+            <div class="payment-grid">
+
+              <!-- PAYTM -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="Paytm"
+                  required
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/paytm.svg"
+                    alt="Paytm"
+                  >
+
+                  <span>
+                    Paytm
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- GPAY -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="GooglePay"
+                  required
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/googlepay.svg"
+                    alt="Google Pay"
+                  >
+
+                  <span>
+                    Google Pay
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- PHONEPE -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="PhonePe"
+                  required
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="{{ url_for('static', filename='img/phonpebw.png') }}"
+                    alt="PhonePe"
+                  >
+
+                  <span>
+                    PhonePe
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- VISA -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="Visa"
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/visa.svg"
+                    alt="Visa"
+                  >
+
+                  <span>
+                    Visa
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- MASTERCARD -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="MasterCard"
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/mastercard.svg"
+                    alt="MasterCard"
+                  >
+
+                  <span>
+                    MasterCard
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- RUPAY -->
+
+              <label class="payment-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="RuPay"
+                >
+
+                <div class="payment-card-inner">
+
+                  <img
+                    src="{{ url_for('static', filename='img/Rupay-Logo.png') }}"
+                    alt="RuPay"
+                  >
+
+                  <span>
+                    RuPay
+                  </span>
+
+                </div>
+
+              </label>
+
+              <!-- COD -->
+
+              <label class="payment-card cod-card">
+
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="COD"
+                >
+
+                <div class="payment-card-inner">
+
+                  <i class="bi bi-cash-stack"></i>
+
+                  <span>
+                    Cash On Delivery
+                  </span>
+
+                </div>
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <!-- BUTTON -->
+
+          <button
+            type="submit"
+            class="complete-order-btn"
+          >
+
+            Complete Purchase
+
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+
+    <div class="checkout-summary-panel">
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+
+          ORDER SUMMARY
+
+        </div>
+
+        <h3 class="summary-title">
+
+          Purchase Details
+
+        </h3>
+
+        <div class="summary-items">
+
+          {% for book in books %}
+
+          <div class="summary-item">
+
+            <div>
+
+              <div class="summary-book-title">
+
+                {{ book.Title }}
+
+              </div>
+
+            </div>
+
+            <div class="summary-price">
+
+              ₹{{ "%.2f"|format(book.Price) }}
+
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+        </div>
+
+        <!-- TOTAL -->
+
+        <div class="summary-total">
+
+          <span>
+            Total Amount
+          </span>
+
+          <strong>
+
+            ₹{{ "%.2f"|format(total) }}
+
+          </strong>
+
+        </div>
+
+        <!-- NOTE -->
+
+        <div class="summary-note">
+
+          Encrypted payment gateway simulation integrated
+          into PageForge purchase workflow to ensure secure transactions.
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {% else %}
+
+  <!-- EMPTY -->
+
+  <div class="empty-cart-wrapper">
+
+    <div class="empty-cart-card">
+
+      <div class="empty-icon">
+
+        <i class="bi bi-bag-x"></i>
+
+      </div>
+
+      <h2>
+
+        No Items Available
+
+      </h2>
+
+      <p>
+
+        Your cart is currently empty.
+        Explore books and build your collection.
+
+      </p>
+
+      <a
+        href="{{ url_for('user_page') }}"
+        class="empty-cart-btn"
+      >
+
+        Explore Library
+
+      </a>
+
+    </div>
+
+  </div>
+
+  {% endif %}
+
+</section>
+
+{% endblock %}

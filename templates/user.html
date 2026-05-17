@@ -1,0 +1,469 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- HERO -->
+
+<section class="hero-section">
+
+  <div class="hero-left">
+
+    <div class="hero-badge">
+
+      Personalized AI Recommendation System
+
+    </div>
+
+    <h1 class="hero-title">
+
+      Discover Your
+
+      <span>Next Read</span>
+
+    </h1>
+
+    <p class="hero-subtitle">
+
+      Intelligent recommendation platform designed
+      to personalize reading experiences through
+      behavioral analysis and genre-based prediction.
+
+    </p>
+
+    <div class="hero-actions">
+
+      <a href="#discover">
+
+        <button
+          type="button"
+          class="hero-btn-primary"
+        >
+
+          Explore Library
+
+        </button>
+
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="hero-right">
+
+    <div class="floating-panel large-panel">
+
+      <div class="panel-label">
+
+        Trending Category
+
+      </div>
+
+      <h3>
+
+        Fantasy & Sci-Fi
+
+      </h3>
+
+      <div class="prediction-value">
+
+        +84%
+
+      </div>
+
+      <p class="panel-desc">
+
+        Readers are increasingly exploring immersive
+        fiction experiences and futuristic storytelling.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- SEARCH -->
+
+<section class="search-wrapper">
+
+  <div class="search-header">
+
+    <p class="section-tag">
+      DISCOVERY ENGINE
+    </p>
+
+    <h2 class="search-title">
+      Explore The Library
+    </h2>
+
+  </div>
+
+  <form
+    id="search-form"
+    method="get"
+  >
+
+    <div class="search-shell">
+
+      <!-- SEARCH -->
+
+      <div class="search-input-wrapper">
+
+        <i class="bi bi-search"></i>
+
+        <input
+          type="text"
+          name="q"
+          class="futuristic-input"
+          placeholder="Search books, authors, genres..."
+          value="{{ request.args.get('q', '') }}"
+        >
+
+      </div>
+
+      <!-- FILTERS -->
+
+      <div class="filter-row">
+
+        <select
+          name="genre"
+          class="futuristic-input"
+        >
+
+          <option value="">
+            Select Genre
+          </option>
+
+          {% for genre in genres %}
+
+          <option value="{{ genre }}">
+
+            {{ genre }}
+
+          </option>
+
+          {% endfor %}
+
+        </select>
+
+        <select
+          name="sort"
+          class="futuristic-input"
+        >
+
+          <option value="">
+            Ranking Preference
+          </option>
+
+          <option value="price">
+            Price Ranking
+          </option>
+
+          <option value="rating">
+            Reader Rating
+          </option>
+
+        </select>
+
+        <button
+          type="submit"
+          class="search-btn"
+        >
+
+          Explore
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </form>
+
+</section>
+
+<!-- RECOMMENDED -->
+
+{% if recommended_books %}
+
+<section
+  class="content-section"
+  id="discover"
+>
+
+  <div class="section-header">
+
+    <div>
+
+      <p class="section-tag">
+
+        PERSONALIZED PICKS
+
+      </p>
+
+      <h2 class="section-title">
+
+        Recommended For You
+
+      </h2>
+
+    </div>
+
+    <div class="section-line"></div>
+
+  </div>
+
+  <div class="book-grid">
+
+    {% for book in recommended_books %}
+
+    <div class="book-card">
+
+      <a
+        href="{{ url_for('book_detail', book_id=book.BookID) }}"
+        class="book-overlay-link"
+      ></a>
+
+      <div class="book-glow"></div>
+
+      <!-- TOP -->
+
+      <div class="book-top">
+
+        <div class="ai-pill">
+
+          RECOMMENDED
+
+        </div>
+
+        <div class="rating-pill">
+
+          ★ {{ "%.1f"|format(book.RatingMean) }}
+
+        </div>
+
+      </div>
+
+      <!-- CONTENT -->
+
+      <div class="book-card-content">
+
+        <h3 class="book-title">
+
+          {{ book.Title }}
+
+        </h3>
+
+        <p class="book-author">
+
+          {{ book.Author }}
+
+        </p>
+
+        <div class="book-genre">
+
+          {{ book.Genre }}
+
+        </div>
+
+        <div class="book-price">
+
+          ₹{{ "%.2f"|format(book.Price) }}
+
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+
+      <div class="book-actions">
+
+        <!-- DETAILS -->
+
+        <a
+          href="{{ url_for('book_detail', book_id=book.BookID) }}"
+          class="book-btn-secondary details-btn"
+        >
+
+          View Details
+
+        </a>
+
+        <!-- CART -->
+
+        <form
+          method="post"
+          action="{{ url_for('add_to_cart') }}"
+          class="add-to-cart-form"
+        >
+
+          <input
+            type="hidden"
+            name="book_id"
+            value="{{ book.BookID }}"
+          >
+
+          <button
+            type="submit"
+            class="book-btn-primary"
+          >
+
+            Add To Cart
+
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+</section>
+
+{% endif %}
+
+<!-- LIBRARY -->
+
+<section class="content-section">
+
+  <div class="section-header">
+
+    <div>
+
+      <p class="section-tag">
+
+        GLOBAL COLLECTION
+
+      </p>
+
+      <h2 class="section-title">
+
+        Discover Collection
+
+      </h2>
+
+    </div>
+
+    <div class="section-line"></div>
+
+  </div>
+
+  <div
+    id="results"
+    class="book-grid"
+  >
+
+    {% for book in books %}
+
+    <div class="book-card">
+
+      <!-- CLICKABLE CARD -->
+
+      <a
+        href="{{ url_for('book_detail', book_id=book.BookID) }}"
+        class="book-overlay-link"
+      ></a>
+
+      <div class="book-glow"></div>
+
+      <!-- TOP -->
+
+      <div class="book-top">
+
+        <div class="genre-pill">
+
+          {{ book.Genre }}
+
+        </div>
+
+        <div class="rating-pill">
+
+          ★ {{ "%.1f"|format(book.RatingMean) }}
+
+        </div>
+
+      </div>
+
+      <!-- CONTENT -->
+
+      <div class="book-card-content">
+
+        <h3 class="book-title">
+
+          {{ book.Title }}
+
+        </h3>
+
+        <p class="book-author">
+
+          {{ book.Author }}
+
+        </p>
+
+        <div class="book-price">
+
+          ₹{{ "%.2f"|format(book.Price) }}
+
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+
+      <div class="book-actions">
+
+        <!-- DETAILS -->
+
+        <a
+          href="{{ url_for('book_detail', book_id=book.BookID) }}"
+          class="book-btn-secondary details-btn"
+        >
+
+          View Details
+
+        </a>
+
+        <!-- CART -->
+
+        <form
+          method="post"
+          action="{{ url_for('add_to_cart') }}"
+          class="add-to-cart-form"
+        >
+
+          <input
+            type="hidden"
+            name="book_id"
+            value="{{ book.BookID }}"
+          >
+
+          <button
+            type="submit"
+            class="book-btn-primary"
+          >
+
+            Add To Cart
+
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="auth-section">
+
+  <!-- LEFT SIDE -->
+
+  <div class="auth-left">
+
+    <div class="auth-badge">
+      Returning Reader
+    </div>
+
+    <h1 class="auth-title">
+
+      Welcome
+
+      <span>Back</span>
+
+    </h1>
+
+    <p class="auth-subtitle">
+
+      Continue exploring personalized recommendations,
+      intelligent discovery, and immersive reading
+      experiences tailored for you.
+
+    </p>
+
+    <!-- FLOATING INFO -->
+
+    <div class="auth-floating-card">
+
+      <div class="floating-label">
+        Personalized Discovery
+      </div>
+
+      <div class="floating-title">
+        AI Curated Reading Experience
+      </div>
+
+      <div class="floating-desc">
+
+        Smart recommendation system designed
+        to understand genre preferences,
+        engagement behavior, and reading patterns.
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+
+  <div class="auth-right">
+
+    <div class="auth-card">
+
+      <div class="auth-card-top">
+
+        <div>
+
+          <p class="section-tag">
+            ACCOUNT ACCESS
+          </p>
+
+          <h2 class="auth-heading">
+
+            Login
+
+          </h2>
+
+        </div>
+
+      </div>
+
+      <form method="post">
+
+        <!-- USERNAME -->
+
+        <div class="auth-input-group">
+
+          <label>
+
+            Username
+
+          </label>
+
+          <input
+            id="username"
+            name="username"
+            type="text"
+            class="auth-input"
+            placeholder="Enter your username"
+            required
+          >
+
+        </div>
+
+        <!-- PASSWORD -->
+
+        <div class="auth-input-group">
+
+          <label>
+
+            Password
+
+          </label>
+
+          <input
+            id="password"
+            name="password"
+            type="password"
+            class="auth-input"
+            placeholder="Enter your password"
+            required
+          >
+
+        </div>
+
+        <!-- BUTTON -->
+
+        <button
+          type="submit"
+          class="auth-submit-btn"
+        >
+
+          Access Account
+
+        </button>
+
+      </form>
+
+      <!-- REGISTER -->
+
+      <div class="auth-footer">
+
+        New to PageForge?
+
+        <a href="{{ url_for('register') }}">
+
+          Create Account
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}
